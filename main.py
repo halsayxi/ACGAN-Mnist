@@ -8,7 +8,7 @@ def parse_args():
     desc = "Pytorch implementation of GAN collections"
     parser = argparse.ArgumentParser(description=desc)
 
-    parser.add_argument('--gan_type', type=str, default='GAN',
+    parser.add_argument('--gan_type', type=str, default='ACGAN',
                         choices=['GAN', 'CGAN', 'infoGAN', 'ACGAN', 'EBGAN', 'BEGAN', 'WGAN', 'WGAN_GP', 'DRAGAN', 'LSGAN'],
                         help='The type of GAN')
     parser.add_argument('--dataset', type=str, default='mnist', choices=['mnist', 'fashion-mnist', 'cifar10', 'cifar100', 'svhn', 'stl10', 'lsun-bed'],
@@ -68,15 +68,8 @@ def main():
     if args.benchmark_mode:
         torch.backends.cudnn.benchmark = True
 
-        # declare instance for GAN
     gan = ACGAN(args)
-        # launch the graph in a session
-    # gan.train()
-    # print(" [*] Training finished!")
-    #
-    # # visualize learned generator
-    # gan.visualize_results(args.epoch)
-    # print(" [*] Testing finished!")
+
     import random
     random_range = [random.randint(0, 9) for _ in range(20)]
     flag=False
