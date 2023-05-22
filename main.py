@@ -1,14 +1,7 @@
 import argparse, os, torch
-from GAN import GAN
-from CGAN import CGAN
-from LSGAN import LSGAN
-from DRAGAN import DRAGAN
+
 from ACGAN import ACGAN
-from WGAN import WGAN
-from WGAN_GP import WGAN_GP
-from infoGAN import infoGAN
-from EBGAN import EBGAN
-from BEGAN import BEGAN
+
 
 """parsing and configuration"""
 def parse_args():
@@ -84,7 +77,17 @@ def main():
     # # visualize learned generator
     # gan.visualize_results(args.epoch)
     # print(" [*] Testing finished!")
-    gan.generate(15)
+    import random
+    random_range = [random.randint(0, 9) for _ in range(20)]
+    flag=False
+    for i in random_range:
+        if not flag:
+            flag=True
+            res=gan.generate(i)
+        else:
+            res=torch.cat((res, gan.generate(i)), dim=0)
+
+    print(res.shape)
 
 if __name__ == '__main__':
     main()

@@ -258,22 +258,17 @@ class ACGAN(object):
         if self.gpu_mode:
             sample_z_, sample_y_ = sample_z_.cuda(), sample_y_.cuda()
         samples = self.G(sample_z_, sample_y_)
-        if self.gpu_mode:
-            samples = samples.cpu().data.numpy().transpose(0, 2, 3, 1)
-        else:
-            samples = samples.data.numpy().transpose(0, 2, 3, 1)
+        # if self.gpu_mode:
+        #     samples = samples.cpu().data.numpy().transpose(0, 2, 3, 1)
+        # else:
+        #     samples = samples.data.numpy().transpose(0, 2, 3, 1)
 
         samples = 1 - (samples + 1) / 2
-        # print(type(samples))
-        # print(len(samples))
-        # print(type(samples[0]))
-        # print(len(samples[0]))
-        # print(type(samples[0][0]))
-        # print(len(samples[0][0]))
-        # print(type(samples[0][0][0]))
-        # print(len(samples[0][0][0]))
-        utils.save_images(samples[:1, :, :, :], [1, 1],
-                          self.result_dir + '/' + self.dataset + '/' + self.model_name + '/' + self.model_name + '_num%03d' % num + '.png')
+        # print("noew")
+        # print(samples.shape)
+        return samples
+        # utils.save_images(samples[:1, :, :, :], [1, 1],
+        #                   self.result_dir + '/' + self.dataset + '/' + self.model_name + '/' + self.model_name + '_num%03d' % num + '.png')
     def save(self):
         save_dir = os.path.join(self.save_dir, self.dataset, self.model_name)
 
