@@ -5,6 +5,8 @@ import torch.optim as optim
 from dataloader import dataloader
 
 class generator(nn.Module):
+    # Network Architecture is exactly same as in infoGAN (https://arxiv.org/abs/1606.03657)
+    # Architecture : FC1024_BR-FC7x7x128_BR-(64)4dc2s_BR-(1)4dc2s_S
     def __init__(self, input_dim=100, output_dim=1, input_size=32, class_num=10):
         super(generator, self).__init__()
         self.input_dim = input_dim
@@ -38,6 +40,8 @@ class generator(nn.Module):
         return x
 
 class discriminator(nn.Module):
+    # Network Architecture is exactly same as in infoGAN (https://arxiv.org/abs/1606.03657)
+    # Architecture : (64)4c2s-(128)4c2s_BL-FC1024_BL-FC1_S
     def __init__(self, input_dim=1, output_dim=1, input_size=32, class_num=10):
         super(discriminator, self).__init__()
         self.input_dim = input_dim
@@ -79,6 +83,7 @@ class ACGAN(object):
     def __init__(self, args):
         # parameters
         self.epoch = args.epoch
+        self.sample_num = 100
         self.batch_size = args.batch_size
         self.save_dir = args.save_dir
         self.result_dir = args.result_dir
@@ -110,10 +115,10 @@ class ACGAN(object):
             self.BCE_loss = nn.BCELoss()
             self.CE_loss = nn.CrossEntropyLoss()
 
-        # print('---------- Networks architecture -------------')
-        # utils.print_network(self.G)
-        # utils.print_network(self.D)
-        # print('-----------------------------------------------')
+        print('---------- Networks architecture -------------')
+        utils.print_network(self.G)
+        utils.print_network(self.D)
+        print('-----------------------------------------------')
 
         # fixed noise & condition
         self.sample_z_ = torch.zeros((self.sample_num, self.z_dim))
@@ -191,9 +196,10 @@ class ACGAN(object):
 
                 G_loss.backward()
                 self.G_optimizer.step()
-                print("\rEpoch: [%2d] [%4d/%4d] D_loss: %.8f, G_loss: %.8f" %
-                      ((epoch + 1), (iter + 1), self.data_loader.dataset.__len__() // self.batch_size, D_loss.item(), G_loss.item()), end='')
-            print()
+
+                if ((iter + 1) % 100) == 0:
+                    print("Epoch: [%2d] [%4d/%4d] D_loss: %.8f, G_loss: %.8f" %
+                          ((epoch + 1), (iter + 1), self.data_loader.dataset.__len__() // self.batch_size, D_loss.item(), G_loss.item()))
 
             self.train_hist['per_epoch_time'].append(time.time() - epoch_start_time)
             with torch.no_grad():
@@ -224,8 +230,6 @@ class ACGAN(object):
             """ random noise """
             sample_y_ = torch.zeros(self.batch_size, self.class_num).scatter_(1, torch.randint(0, self.class_num - 1, (self.batch_size, 1)).type(torch.LongTensor), 1)
             sample_z_ = torch.rand((self.batch_size, self.z_dim))
-
-
             if self.gpu_mode:
                 sample_z_, sample_y_ = sample_z_.cuda(), sample_y_.cuda()
 
@@ -246,9 +250,10 @@ class ACGAN(object):
 
         if not os.path.exists(self.result_dir + '/' + self.dataset + '/' + self.model_name):
             os.makedirs(self.result_dir + '/' + self.dataset + '/' + self.model_name)
-        
+
         sample_y_ = torch.zeros(1, self.class_num)
         sample_z_ = torch.rand((1, self.z_dim))
+        #here
         sample_y_[0][num] = 1.
         if self.gpu_mode:
             sample_z_, sample_y_ = sample_z_.cuda(), sample_y_.cuda()
@@ -259,9 +264,16 @@ class ACGAN(object):
             samples = samples.data.numpy().transpose(0, 2, 3, 1)
 
         samples = 1 - (samples + 1) / 2
+        # print(type(samples))
+        # print(len(samples))
+        # print(type(samples[0]))
+        # print(len(samples[0]))
+        # print(type(samples[0][0]))
+        # print(len(samples[0][0]))
+        # print(type(samples[0][0][0]))
+        # print(len(samples[0][0][0]))
         utils.save_images(samples[:1, :, :, :], [1, 1],
                           self.result_dir + '/' + self.dataset + '/' + self.model_name + '/' + self.model_name + '_num%03d' % num + '.png')
-
     def save(self):
         save_dir = os.path.join(self.save_dir, self.dataset, self.model_name)
 

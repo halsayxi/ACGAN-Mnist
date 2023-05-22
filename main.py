@@ -1,16 +1,27 @@
 import argparse, os, torch
+from GAN import GAN
+from CGAN import CGAN
+from LSGAN import LSGAN
+from DRAGAN import DRAGAN
 from ACGAN import ACGAN
+from WGAN import WGAN
+from WGAN_GP import WGAN_GP
+from infoGAN import infoGAN
+from EBGAN import EBGAN
+from BEGAN import BEGAN
 
 """parsing and configuration"""
 def parse_args():
     desc = "Pytorch implementation of GAN collections"
     parser = argparse.ArgumentParser(description=desc)
 
-    parser.add_argument('--gan_type', type=str, default='ACGAN')
+    parser.add_argument('--gan_type', type=str, default='GAN',
+                        choices=['GAN', 'CGAN', 'infoGAN', 'ACGAN', 'EBGAN', 'BEGAN', 'WGAN', 'WGAN_GP', 'DRAGAN', 'LSGAN'],
+                        help='The type of GAN')
     parser.add_argument('--dataset', type=str, default='mnist', choices=['mnist', 'fashion-mnist', 'cifar10', 'cifar100', 'svhn', 'stl10', 'lsun-bed'],
                         help='The name of dataset')
     parser.add_argument('--split', type=str, default='', help='The split flag for svhn and stl10')
-    parser.add_argument('--epoch', type=int, default=1, help='The number of epochs to run')
+    parser.add_argument('--epoch', type=int, default=50, help='The number of epochs to run')
     parser.add_argument('--batch_size', type=int, default=64, help='The size of batch')
     parser.add_argument('--input_size', type=int, default=28, help='The size of input image')
     parser.add_argument('--save_dir', type=str, default='models',
@@ -66,10 +77,14 @@ def main():
 
         # declare instance for GAN
     gan = ACGAN(args)
+        # launch the graph in a session
     # gan.train()
+    # print(" [*] Training finished!")
+    #
+    # # visualize learned generator
     # gan.visualize_results(args.epoch)
-    for i in range(10):
-        gan.generate(i)
+    # print(" [*] Testing finished!")
+    gan.generate(15)
 
 if __name__ == '__main__':
     main()
