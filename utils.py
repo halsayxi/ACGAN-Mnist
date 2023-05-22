@@ -78,6 +78,14 @@ def save_images(images, size, image_path):
 def imsave(images, size, path):
     image = np.squeeze(merge(images, size))
     image = (image * 255).astype(np.uint8)
+    image = np.expand_dims(image, axis=2)
+    print(image.shape)
+    # 假设 image 是一个三维数组，形状为 (height, width, channels)
+    image_tensor = torch.from_numpy(image.transpose((2, 0, 1))).unsqueeze(0)
+    combined_tensor = torch.cat((image_tensor, image_tensor), dim=0)
+    print(type(combined_tensor))
+    print(combined_tensor.shape)
+
     return imageio.imsave(path, image)
     # return cv2.imwrite(path, image * 255)
     # return scipy.misc.imsave(path, image)
