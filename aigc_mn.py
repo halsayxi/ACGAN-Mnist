@@ -97,11 +97,13 @@ class ACGAN:
         sample_y_[0][num] = 1.
         sample_z_ = torch.rand((1, self.z_dim))
 
-        noise = 0.02 * torch.randn(1, 28, 28)    # 高斯噪声，效果很差
+        noise = torch.rand(1, 28, 28) * 0.005   # 添加均匀噪声，该计算结果最终对某一色块数值增加1，但是如果加到255上就会把它变成0
 
         if torch.cuda.is_available():
             sample_z_, sample_y_, noise = sample_z_.cuda(), sample_y_.cuda(), noise.cuda()
-        samples = (self.G(sample_z_, sample_y_) + 1) / 2 + noise / 10
+
+        samples = (self.G(sample_z_, sample_y_) + 1) / 2 + noise
+        print((noise * 255).detach().squeeze().cpu().numpy().astype('uint8'))   # 噪声图片数值显示
         
         return samples
 
