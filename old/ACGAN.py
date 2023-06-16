@@ -2,11 +2,13 @@ import utils, torch, time, os, pickle
 import numpy as np
 import torch.nn as nn
 import torch.optim as optim
-from dataloader import dataloader
+from utils import dataloader
+
+
+# Network Architecture is exactly same as in infoGAN (https://arxiv.org/abs/1606.03657)
+# Architecture : FC1024_BR-FC7x7x128_BR-(64)4dc2s_BR-(1)4dc2s_S
 
 class generator(nn.Module):
-    # Network Architecture is exactly same as in infoGAN (https://arxiv.org/abs/1606.03657)
-    # Architecture : FC1024_BR-FC7x7x128_BR-(64)4dc2s_BR-(1)4dc2s_S
     def __init__(self, input_dim=100, output_dim=1, input_size=32, class_num=10):
         super(generator, self).__init__()
         self.input_dim = input_dim
@@ -40,8 +42,6 @@ class generator(nn.Module):
         return x
 
 class discriminator(nn.Module):
-    # Network Architecture is exactly same as in infoGAN (https://arxiv.org/abs/1606.03657)
-    # Architecture : (64)4c2s-(128)4c2s_BL-FC1024_BL-FC1_S
     def __init__(self, input_dim=1, output_dim=1, input_size=32, class_num=10):
         super(discriminator, self).__init__()
         self.input_dim = input_dim
@@ -114,11 +114,6 @@ class ACGAN(object):
         else:
             self.BCE_loss = nn.BCELoss()
             self.CE_loss = nn.CrossEntropyLoss()
-
-        print('---------- Networks architecture -------------')
-        utils.print_network(self.G)
-        utils.print_network(self.D)
-        print('-----------------------------------------------')
 
         # fixed noise & condition
         self.sample_z_ = torch.zeros((self.sample_num, self.z_dim))
@@ -241,7 +236,7 @@ class ACGAN(object):
             samples = samples.data.numpy().transpose(0, 2, 3, 1)
 
         samples = (samples + 1) / 2
-        utils.save_images(samples[:image_frame_dim * image_frame_dim, :, :, :], [image_frame_dim, image_frame_dim],
+        utils.imsave(samples[:image_frame_dim * image_frame_dim, :, :, :], [image_frame_dim, image_frame_dim],
                           self.result_dir + '/' + self.dataset + '/' + self.model_name + '/' + self.model_name + '_epoch%03d' % epoch + '.png')
 
     def generate(self, num):
@@ -264,11 +259,8 @@ class ACGAN(object):
         #     samples = samples.data.numpy().transpose(0, 2, 3, 1)
 
         samples = 1 - (samples + 1) / 2
-        # print("noew")
-        # print(samples.shape)
         return samples
-        # utils.save_images(samples[:1, :, :, :], [1, 1],
-        #                   self.result_dir + '/' + self.dataset + '/' + self.model_name + '/' + self.model_name + '_num%03d' % num + '.png')
+
     def save(self):
         save_dir = os.path.join(self.save_dir, self.dataset, self.model_name)
 
@@ -286,3 +278,5 @@ class ACGAN(object):
 
         self.G.load_state_dict(torch.load(os.path.join(save_dir, self.model_name + '_G.pkl')))
         self.D.load_state_dict(torch.load(os.path.join(save_dir, self.model_name + '_D.pkl')))
+
+
