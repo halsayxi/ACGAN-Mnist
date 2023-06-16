@@ -4,6 +4,8 @@ from ACGAN import ACGAN
 
 
 """parsing and configuration"""
+
+# 删！！
 def parse_args():
     desc = "Pytorch implementation of GAN collections"
     parser = argparse.ArgumentParser(description=desc)
