@@ -97,7 +97,7 @@ class ACGAN:
         sample_y_[0][num] = 1.
         sample_z_ = torch.rand((1, self.z_dim))
 
-        noise = torch.rand(1, 28, 28) * 0.05   # 均匀噪声,0.05为系数，可调
+        noise = torch.rand(1, 28, 28) * 0.01   # 均匀噪声
 
         if torch.cuda.is_available():
             sample_z_, sample_y_, noise = sample_z_.cuda(), sample_y_.cuda(), noise.cuda()
@@ -154,18 +154,3 @@ def main():
 # Test here
 if __name__ == '__main__':
     main()
-
-# batch_size = 10  # 批量大小
-# input_tensor = torch.randint(0, 10, (batch_size,)).long()
-# aigcmn = AiGcMn()
-# generated_images = aigcmn.generate(input_tensor)
-# print(generated_images.shape)
-#
-# # 保存生成的图像
-# for i in range(batch_size):
-#     img = generated_images[i].squeeze().detach().numpy()
-#     img = 1 - img  # 取反，黑底白字
-#     img = (img * 255).astype(np.uint8)  # 将图像数据转换为 uint8 类型
-#     image_path = os.path.join("./results/mnist/ACGAN", f"image_{i}.png")
-#     imageio.imwrite(image_path, img)
-# print("images saved.")
